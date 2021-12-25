@@ -79,13 +79,13 @@ jobs:
             sudo rm config-${kver}
             echo "PACKAGED_OUTPUTPATH=${dest}" >> $GITHUB_ENV
             echo "::set-output name=status::success"
-            
-    - name: Upload Firmware Files to GitHub Release
-      uses: ncipollo/release-action@v1
-      if: steps.build.outputs.status == 'success' && !cancelled()
-      with:
-        allowUpdates: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Test Kernel
-        tag: test-kernel
-        artifacts: ${{ env.PACKAGED_OUTPUTPATH }}
+
+      - name: Upload Firmware Files to GitHub Release
+        uses: ncipollo/release-action@v1
+        if: steps.build.outputs.status == 'success' && !cancelled()
+        with:
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Test Kernel
+          tag: test-kernel
+          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}
