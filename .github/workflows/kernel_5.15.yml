@@ -50,12 +50,12 @@ jobs:
           run: |
             git clone --depth 1 ${REPO_KERNEL} -b ${REPO_BRANCH} kernel
             cd kernel
-            wget -O .config ${CONFIG_URL}
-            echo -e "$(nproc) thread compile"
             img="Image"
             arch="arm64"
             dtbs="dtbs"
             make defconfig
+            wget -O .config ${CONFIG_URL}
+            echo -e "$(nproc) thread compile"
             make -j$(nproc) ${img} modules ${dtbs}
             kver=`make kernelrelease`
             dest="out"
