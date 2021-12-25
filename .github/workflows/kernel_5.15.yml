@@ -34,7 +34,7 @@ jobs:
           env: |
             REPO_KERNEL: https://github.com/unifreq/linux-5.15.y
             REPO_BRANCH: main
-            CONFIG_URL: https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.15.y/coba.config
+            CONFIG_URL: https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.15.y/flippy.config
           
           # The shell to run commands with in the container
           shell: /bin/bash
