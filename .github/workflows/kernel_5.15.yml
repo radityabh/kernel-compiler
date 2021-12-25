@@ -51,6 +51,7 @@ jobs:
             git clone --depth 1 ${REPO_KERNEL} -b ${REPO_BRANCH} kernel
             cd kernel
             wget -O .config ${CONFIG_URL}
+            sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
             echo -e "$(nproc) thread compile"
             img="Image"
             arch="arm64"
