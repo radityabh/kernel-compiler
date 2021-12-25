@@ -20,6 +20,8 @@ jobs:
       - uses: actions/checkout@v2.1.0
       - uses: uraimo/run-on-arch-action@v2.1.1
         name: Run commands
+        env:
+          DEBIAN_FRONTEND: noninteractive
         id: runcmd
         with:
           arch: aarch64
@@ -39,8 +41,7 @@ jobs:
           
           install: |
             apt-get -qq update
-            apt-get -qq install curl
-            apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804) rdate build-essential libncurses-dev bison flex libssl-dev libelf-dev git
+            apt-get -qq install curl wget build-essential libncurses-dev bison flex libssl-dev libelf-dev git
             apt-get -qq autoremove --purge
             apt-get -qq clean
             ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
