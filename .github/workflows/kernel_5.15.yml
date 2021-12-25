@@ -41,7 +41,8 @@ jobs:
           
           install: |
             apt-get -qq update
-            apt-get -qq install curl wget build-essential libncurses-dev bison flex libssl-dev libelf-dev git u-boot-tools uboot-mkimage
+            apt-get -qq install curl wget build-essential libncurses-dev bison flex libssl-dev libelf-dev git u-boot-tools
+            apt-get -qq install uboot-mkimage
             apt-get -qq autoremove --purge
             apt-get -qq clean
             ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
