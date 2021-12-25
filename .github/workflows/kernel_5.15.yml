@@ -40,12 +40,10 @@ jobs:
             apt-get -qq autoremove --purge
             apt-get -qq clean
             ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
-          
-          clone: |
-            git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel
 
           # Set an output parameter `uname` for use in subsequent steps
           run: |
+            git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel
             cd kernel
             ls
             uname -a
