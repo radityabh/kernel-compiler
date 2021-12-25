@@ -34,7 +34,7 @@ jobs:
           env: |
             REPO_KERNEL: https://github.com/unifreq/linux-5.15.y
             REPO_BRANCH: main
-            CONFIG_URL: https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.15.y/.config
+            CONFIG_URL: https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.15.y/coba.config
           
           # The shell to run commands with in the container
           shell: /bin/sh
@@ -53,23 +53,23 @@ jobs:
             img="Image"
             arch="arm64"
             dtbs="dtbs"
-            make defconfig
             wget -O .config ${CONFIG_URL}
+            sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
             echo -e "$(nproc) thread compile"
-            make -j$(nproc) ${img} modules ${dtbs}
+            time make -j$(nproc) ${img} modules ${dtbs}
             kver=`make kernelrelease`
             dest="out"
-            sudo rm -rf ${dest}
-            sudo mkdir -p ${dest}
-            sudo make modules_install
-            sudo make headers_install INSTALL_HDR_PATH=/usr
-            sudo make install
+            rm -rf ${dest}
+            mkdir -p ${dest}
+            make modules_install
+            make headers_install INSTALL_HDR_PATH=/usr
+            make install
             cd /boot
-            sudo cp config-${kver} ${PWD}/${dest}
-            sudo cp initrd.img-${kver} ${PWD}/${dest}
-            sudo cp uInitrd-${kver} ${PWD}/${dest}
-            sudo cp config-${kver} ${PWD}/${dest}
-            sudo cp vmlinuz-${kver} ${PWD}/${dest}
+            cp config-${kver} ${PWD}/${dest}
+            cp initrd.img-${kver} ${PWD}/${dest}
+            cp uInitrd-${kver} ${PWD}/${dest}
+            cp config-${kver} ${PWD}/${dest}
+            cp vmlinuz-${kver} ${PWD}/${dest}
             echo "PACKAGED_OUTPUTPATH=${PWD}/${dest}" >> $GITHUB_ENV
             echo "::set-output name=status::success"
 
