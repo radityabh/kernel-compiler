@@ -17,7 +17,7 @@ jobs:
   build_job:
     # The host should always be Linux
     runs-on: ubuntu-18.04
-    name: Build on ubuntu-18.04 aarch64
+    name: Build Kernel
     steps:
       - uses: actions/checkout@v2.1.0
       - uses: uraimo/run-on-arch-action@v2.0.5
@@ -35,14 +35,19 @@ jobs:
           shell: /bin/sh
           
           install: |
-            sudo -E apt-get -qq update
-            sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804) rdate build-essential libncurses-dev bison flex libssl-dev libelf-dev
-            sudo -E apt-get -qq autoremove --purge
-            sudo -E apt-get -qq clean
-            sudo ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+            apt-get -qq update
+            apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804) rdate build-essential libncurses-dev bison flex libssl-dev libelf-dev
+            apt-get -qq autoremove --purge
+            apt-get -qq clean
+            ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+          
+          clone: |
+            git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel
 
           # Set an output parameter `uname` for use in subsequent steps
           run: |
+            cd kernel
+            ls
             uname -a
             echo ::set-output name=uname::$(uname -a)
 
