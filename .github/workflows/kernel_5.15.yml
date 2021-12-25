@@ -41,7 +41,7 @@ jobs:
           
           install: |
             apt-get -qq update
-            apt-get -qq install curl wget build-essential libncurses-dev bison flex libssl-dev libelf-dev git
+            apt-get -qq install curl wget build-essential libncurses-dev bison flex libssl-dev libelf-dev git u-boot-tools uboot-mkimage
             apt-get -qq autoremove --purge
             apt-get -qq clean
             ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
@@ -52,9 +52,41 @@ jobs:
             cd kernel
             wget -O .config ${CONFIG_URL}
             echo -e "$(nproc) thread compile"
+            img="Image"
+            arch="arm64"
+            dtbs="dtbs"
+            make -j$(nproc) ${img} modules ${dtbs}
+            kver=`make kernelrelease`
+            dest="/boot/kernel.d/linux-${kver}"
+            sudo rm -rf ${dest}
+            sudo mkdir -p ${dest}
+            sudo rm -rf /boot/kernel.d/test
+            sudo ln -s ${dest} /boot/kernel.d/test
+            sudo cp System.map arch/${arch}/boot/${img} arch/${arch}/boot/dts/amlogic/*.dtb ${dest}
+            sudo mkimage -A ${arch} -O linux -T kernel -C none -a 0x1080000 -e 0x1080000 -n ${kver} -d arch/${arch}/boot/${img} ${dest}/uImage
+            sudo cp .config ${dest}/config-${kver}
+            find . -type f -name '*.ko' | sudo xargs -n 1 objcopy --strip-unneeded
+            sudo make modules_install
+            sudo make headers_install INSTALL_HDR_PATH=/usr
+            cd /boot
+            sudo rm -f config-${kver}
+            sudo rm -f initrd.img-${kver}
+            sudo ln -s ${dest}/config-${kver} .
+            sudo update-initramfs -c -k ${kver}
+            sudo mkimage -A ${arch} -O linux -T ramdisk -a 0x0 -e 0x0 -n initrd-${kver}.img -d initrd.img-${kver} uInitrd-${kver}
+            sudo mv initrd.img-${kver} ${dest}
+            sudo mv uInitrd-${kver} ${dest}/uInitrd
+            sudo rm config-${kver}
+            echo "PACKAGED_OUTPUTPATH=${dest}" >> $GITHUB_ENV
+            echo "::set-output name=status::success"
 
 
-      - name: Get the output
-        # Echo the `uname` output parameter from the `runcmd` step
-        run: |
-          echo "The uname output was ${{ steps.runcmd.outputs.uname }}"
+    - name: Upload Firmware Files to GitHub Release
+      uses: ncipollo/release-action@v1
+      if: steps.build.outputs.status == 'success' && !cancelled()
+      with:
+        allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Test Kernel
+        tag: test-kernel
+        artifacts: ${{ env.PACKAGED_OUTPUTPATH }}
