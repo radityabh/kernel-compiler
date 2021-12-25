@@ -8,8 +8,6 @@ on:
     #- cron: "36 19 * * 2,6"
     
 env:
-  REPO_KERNEL: https://github.com/unifreq/linux-5.15.y
-  REPO_BRANCH: main
   UPLOAD_RELEASE: true
   TZ: Asia/Jakarta
 
@@ -30,6 +28,10 @@ jobs:
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
           githubToken: ${{ github.token }}
+
+          env: |
+            REPO_KERNEL: https://github.com/unifreq/linux-5.15.y
+            REPO_BRANCH: main
           
           # The shell to run commands with in the container
           shell: /bin/sh
@@ -43,7 +45,7 @@ jobs:
 
           # Set an output parameter `uname` for use in subsequent steps
           run: |
-            git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel
+            git clone --depth 1 ${REPO_URL} -b ${REPO_BRANCH} kernel
             cd kernel
             ls
             uname -a
