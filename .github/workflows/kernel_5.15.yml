@@ -37,7 +37,7 @@ jobs:
             CONFIG_URL: https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.15.y/coba.config
           
           # The shell to run commands with in the container
-          shell: /bin/sh
+          shell: /bin/bash
           
           install: |
             apt-get -qq update
@@ -56,7 +56,7 @@ jobs:
             wget -O .config ${CONFIG_URL}
             sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
             echo -e "$(nproc) thread compile"
-            time make -j$(nproc) ${img} modules ${dtbs}
+            make -j$(nproc) ${img} modules ${dtbs}
             kver=`make kernelrelease`
             dest="out"
             rm -rf ${dest}
