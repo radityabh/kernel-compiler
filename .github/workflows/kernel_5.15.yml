@@ -42,7 +42,6 @@ jobs:
           install: |
             apt-get -qq update
             apt-get -qq install curl wget build-essential libncurses-dev bison flex libssl-dev libelf-dev git u-boot-tools
-            apt-get -qq install uboot-mkimage
             apt-get -qq autoremove --purge
             apt-get -qq clean
             ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
@@ -58,27 +57,19 @@ jobs:
             dtbs="dtbs"
             make -j$(nproc) ${img} modules ${dtbs}
             kver=`make kernelrelease`
-            dest="/boot/kernel.d/linux-${kver}"
+            dest="out"
             sudo rm -rf ${dest}
             sudo mkdir -p ${dest}
-            sudo rm -rf /boot/kernel.d/test
-            sudo ln -s ${dest} /boot/kernel.d/test
-            sudo cp System.map arch/${arch}/boot/${img} arch/${arch}/boot/dts/amlogic/*.dtb ${dest}
-            sudo mkimage -A ${arch} -O linux -T kernel -C none -a 0x1080000 -e 0x1080000 -n ${kver} -d arch/${arch}/boot/${img} ${dest}/uImage
-            sudo cp .config ${dest}/config-${kver}
-            find . -type f -name '*.ko' | sudo xargs -n 1 objcopy --strip-unneeded
             sudo make modules_install
             sudo make headers_install INSTALL_HDR_PATH=/usr
+            sudo make install
             cd /boot
-            sudo rm -f config-${kver}
-            sudo rm -f initrd.img-${kver}
-            sudo ln -s ${dest}/config-${kver} .
-            sudo update-initramfs -c -k ${kver}
-            sudo mkimage -A ${arch} -O linux -T ramdisk -a 0x0 -e 0x0 -n initrd-${kver}.img -d initrd.img-${kver} uInitrd-${kver}
-            sudo mv initrd.img-${kver} ${dest}
-            sudo mv uInitrd-${kver} ${dest}/uInitrd
-            sudo rm config-${kver}
-            echo "PACKAGED_OUTPUTPATH=${dest}" >> $GITHUB_ENV
+            sudo cp config-${kver} ${PWD}/${dest}
+            sudo cp initrd.img-${kver} ${PWD}/${dest}
+            sudo cp uInitrd-${kver} ${PWD}/${dest}
+            sudo cp config-${kver} ${PWD}/${dest}
+            sudo cp vmlinuz-${kver} ${PWD}/${dest}
+            echo "PACKAGED_OUTPUTPATH=${PWD}/${dest}" >> $GITHUB_ENV
             echo "::set-output name=status::success"
 
       - name: Upload Firmware Files to GitHub Release
