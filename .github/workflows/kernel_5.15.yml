@@ -38,7 +38,7 @@ jobs:
           
           install: |
             apt-get -qq update
-            apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804) rdate build-essential libncurses-dev bison flex libssl-dev libelf-dev
+            apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804) rdate build-essential libncurses-dev bison flex libssl-dev libelf-dev git
             apt-get -qq autoremove --purge
             apt-get -qq clean
             ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
