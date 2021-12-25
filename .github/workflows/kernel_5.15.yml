@@ -32,13 +32,14 @@ jobs:
           env: |
             REPO_KERNEL: https://github.com/unifreq/linux-5.15.y
             REPO_BRANCH: main
+            CONFIG_URL: https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.15.y/.config
           
           # The shell to run commands with in the container
           shell: /bin/sh
           
           install: |
             apt-get -qq update
-            apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804) rdate build-essential libncurses-dev bison flex libssl-dev libelf-dev git
+            apt-get -qq install curl $(curl -fsSL git.io/depends-ubuntu-1804) rdate build-essential libncurses-dev bison flex libssl-dev libelf-dev git
             apt-get -qq autoremove --purge
             apt-get -qq clean
             ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
@@ -47,9 +48,9 @@ jobs:
           run: |
             git clone --depth 1 ${REPO_KERNEL} -b ${REPO_BRANCH} kernel
             cd kernel
-            ls
-            uname -a
-            echo ::set-output name=uname::$(uname -a)
+            wget -O .config ${CONFIG_URL}
+            echo -e "$(nproc) thread compile"
+
 
       - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
