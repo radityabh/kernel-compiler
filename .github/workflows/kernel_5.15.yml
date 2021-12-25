@@ -53,8 +53,9 @@ jobs:
             img="Image"
             arch="arm64"
             dtbs="dtbs"
-            wget -O .config ${CONFIG_URL}
-            sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
+            # wget -O .config ${CONFIG_URL}
+            # sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
+            make defconfig
             echo -e "$(nproc) thread compile"
             make -j$(nproc) ${img} modules ${dtbs}
             kver=`make kernelrelease`
