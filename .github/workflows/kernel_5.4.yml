@@ -78,12 +78,14 @@ jobs:
         touch release.txt
         echo "::set-output name=status::success"
 
-    - name: Upload kernel to release
-      uses: softprops/action-gh-release@v1
-      if: steps.tag.outputs.status == 'success' && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+    - name: Upload Firmware Files to GitHub Release
+      uses: ncipollo/release-action@v1
+      if: steps.build.outputs.status == 'success' && !cancelled()
       with:
-        tag_name: ${{ steps.tag.outputs.release_tag }}
-        body_path: release.txt
-        files: /workdir/upload/*
+        allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: ${{ steps.tag.outputs.release_tag }}
+        tag: ${{ steps.tag.outputs.release_tag }}
+        artifacts:  /workdir/upload/*
+        body: |
+          **Custom Kernel For S9XXX**
