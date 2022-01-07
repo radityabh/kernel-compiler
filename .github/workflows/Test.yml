@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Build 5.15.y
+name: Build initrd
 
 on:
   workflow_dispatch:
@@ -48,23 +48,11 @@ jobs:
 
           # Set an output parameter `uname` for use in subsequent steps
           run: |
-            git clone --depth 1 ${REPO_KERNEL} -b ${REPO_BRANCH} kernel
-            cd kernel
-            img="Image"
-            arch="arm64"
-            dtbs="dtbs"
-            # wget -O .config ${CONFIG_URL}
-            # sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
-            make defconfig
-            echo -e "$(nproc) thread compile"
-            make -j$(nproc) ${img} modules ${dtbs}
-            kver=`make kernelrelease`
+            wget https://github.com/radityabh/kernel-compiler/releases/download/Amlogic_Kernel_5.15.13_latest_arm64_2022.01.07-1624/linux-image-5.4.170-raditbh_5.4.170-raditbh-1_arm64.deb
+            dpkg -i linux-image-5.4.170-raditbh_5.4.170-raditbh-1_arm64.deb
             dest="out"
             rm -rf ${dest}
             mkdir -p ${dest}
-            make modules_install
-            make headers_install INSTALL_HDR_PATH=/usr
-            make install
             cd /boot
             cp config-${kver} ${PWD}/${dest}
             cp initrd.img-${kver} ${PWD}/${dest}
