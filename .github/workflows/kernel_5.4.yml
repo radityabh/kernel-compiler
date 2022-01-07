@@ -60,6 +60,7 @@ jobs:
         wget -O .config https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.4.y/config
         sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
         wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/add_driver.sh
+        chmod +x ./add_driver.sh
         ./add_driver.sh
         echo -e "$(nproc) thread compile"
         sudo time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LOCALVERSION= -j$(nproc) deb-pkg
