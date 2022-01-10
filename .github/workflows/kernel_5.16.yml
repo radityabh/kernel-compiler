@@ -49,8 +49,8 @@ jobs:
       if: steps.check.outputs.status == 'success'
       run: |
         df -hT $PWD
-        kernel_file=$(curl -s https://www.kernel.org/ | grep '5.16' | grep '.tar.xz' | awk -F '"' '{print $2}')
-        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.16' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}')
+        kernel_file=$(curl -s https://www.kernel.org/ | grep '5.16' | grep '.tar.xz' | awk -F '"' '{print $2}' | head -n 1)
+        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.16' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}' | head -n 1)
         wget -O kernel.tar.xz $kernel_file
         tar -Jxvf kernel.tar.xz -C /workdir && cd /workdir/linux-$kernel_ver
         echo "::set-output name=status::success"
@@ -60,7 +60,7 @@ jobs:
       if: steps.code.outputs.status == 'success'
       working-directory: /workdir
       run: |
-        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.16' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}')
+        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.16' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}' | head -n 1)
         cd linux-$kernel_ver
         wget -O .config https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.16.y/config
         sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
@@ -85,7 +85,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && steps.compile.outputs.status == 'success' && !cancelled()
       run: |
-        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.16' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}')
+        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.16' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}' | head -n 1)
         echo "::set-output name=release_tag::Amlogic_Kernel_${kernel_ver}_latest_arm64_$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
         echo "::set-output name=status::success"
