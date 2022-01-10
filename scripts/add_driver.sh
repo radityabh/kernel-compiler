@@ -25,3 +25,6 @@ source "drivers/net/wireless/realtek/rtl8822cs/Kconfig"
 endif # WLAN_VENDOR_REALTEK
 EOF
 
+sed -i 's#---help---##g' "$wd/rtl8189fs/Kconfig"
+sed -i 's#---help---##g' "$wd/rtl8189es/Kconfig"
+sed -i 's#---help---##g' "$wd/rtl8188fu/Kconfig"
