@@ -69,6 +69,8 @@ jobs:
         chmod +x ./*.sh
         ./add_driver.sh
         ./run_patch.sh
+        rm -rf ./patch
+        rm -rf ./*.sh
         echo -e "$(nproc) thread compile"
         export LOCALVERSION=
         export KDEB_PKGVERSION=1
