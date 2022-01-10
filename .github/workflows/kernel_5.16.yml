@@ -98,8 +98,8 @@ jobs:
       with:
         allowUpdates: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        name: ${{ steps.tag.outputs.release_tag }}
         tag: ${{ steps.tag.outputs.release_tag }}
+        allowUpdates: true
         artifacts:  /workdir/upload/*
         body: |
           **Custom Kernel For S9XXX**
