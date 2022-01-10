@@ -25,6 +25,10 @@ source "drivers/net/wireless/realtek/rtl8822cs/Kconfig"
 endif # WLAN_VENDOR_REALTEK
 EOF
 
+#-----------------patch kernel 5.16
 sed -i 's#---help---##g' "$wd/rtl8189fs/Kconfig"
+sed -i 's#Help message of RTL8189FS##g' "$wd/rtl8189fs/Kconfig"
 sed -i 's#---help---##g' "$wd/rtl8189es/Kconfig"
+sed -i 's#Help message of RTL8189ES##g' "$wd/rtl8189es/Kconfig"
 sed -i 's#---help---##g' "$wd/rtl8188fu/Kconfig"
+sed -i 's#Help message of RTL8188FU##g' "$wd/rtl8188fu/Kconfig"
