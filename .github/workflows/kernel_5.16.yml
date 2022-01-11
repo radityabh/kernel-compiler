@@ -30,7 +30,7 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install subversion build-essential libncurses-dev bison flex libssl-dev libelf-dev
+        sudo -E apt-get -qq install subversion build-essential libncurses-dev bison flex libssl-dev libelf-dev gcc-aarch64-linux-gnu
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
