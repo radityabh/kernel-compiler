@@ -20,7 +20,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: docker.io/qctt/kernelbuild:ubuntu20.04
     
     steps:
     - name: Checkout
@@ -76,8 +75,7 @@ jobs:
         export KDEB_PKGVERSION=1
         sudo time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) deb-pkg
         cd /workdir 
-        tar -czvf $kernel_ver.tar.gz *.deb
-        mv *.tar.gz /workdir/upload
+        mv *.deb /workdir/upload
         echo "::set-output name=status::success"
         echo "FILE_DATE=Kernel_Amlogic_$kernel_ver_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV   
 
