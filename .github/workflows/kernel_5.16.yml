@@ -35,6 +35,7 @@ jobs:
         sudo -E apt-get -qq clean
         sudo ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
         sudo mkdir -p /workdir
+        sudo mkdir -p /workdir/upload
         sudo chown $USER:$GROUPS /workdir
         sudo chown $USER:$GROUPS /workdir/upload
 
