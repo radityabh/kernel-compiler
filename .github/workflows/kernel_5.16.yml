@@ -92,7 +92,7 @@ jobs:
         
         #Boot
         cd /workdir/boot
-        wget -O uIntrd-$kver https://github.com/radityabh/kernel-compiler/raw/main/files/uintrd/uInitrd-5.16
+        wget -O uInitrd-$kver https://github.com/radityabh/kernel-compiler/raw/main/files/uintrd/uInitrd-5.16
         chmod +x *
         tar -czf boot-$kver.tar.gz * && sync
         cp -f *.tar.gz /workdir/upload
