@@ -82,7 +82,7 @@ jobs:
         # sudo time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 1)) deb-pkg
         # cd /workdir 
         # mv *.deb /workdir/upload
-        time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 1)) Image modules
+        time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 2)) Image modules
         kver=`make kernelrelease`
         make INSTALL_MOD_PATH=./tmp_modules modules_install
         cp -f ./System.map /workdir/boot/System.map-$kver
@@ -92,6 +92,7 @@ jobs:
         
         #Boot
         cd /workdir/boot
+        wget -O uIntrd-$kver https://github.com/radityabh/kernel-compiler/raw/main/files/uintrd/uInitrd-$kernel_ver
         chmod +x *
         tar -czf boot-$kver.tar.gz * && sync
         cp -f *.tar.gz /workdir/upload
@@ -104,6 +105,9 @@ jobs:
         
         #dtbs
         cd /workdir/upload
+        wget -O dtb-amlogic-$kver.tar.gz https://github.com/radityabh/kernel-compiler/raw/main/files/dtb/dtb.tar.gz
+        chmod +x *
+
         echo "::set-output name=status::success"
         echo "FILE_DATE=Kernel_Amlogic_$kernel_ver_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV   
 
@@ -116,7 +120,7 @@ jobs:
       if: env.UPLOAD_RELEASE == 'true' && steps.compile.outputs.status == 'success' && !cancelled()
       run: |
         kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.16' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}' | head -n 1)
-        echo "::set-output name=release_tag::Amlogic_Kernel_${kernel_ver}_latest_arm64_$(date +"%Y.%m.%d-%H%M")"
+        echo "::set-output name=release_tag::Kernel_${kernel_ver}_arm64_$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
         echo "::set-output name=status::success"
 
