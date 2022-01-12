@@ -20,7 +20,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: docker.io/qctt/kernelbuild:ubuntu20.04
     
     steps:
     - name: Checkout
@@ -31,12 +30,18 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install subversion
+        sudo -E apt-get -qq install subversion build-essential libncurses-dev bison flex libssl-dev libelf-dev gcc-aarch64-linux-gnu
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+        sudo mkdir -p /workdir
+        sudo mkdir -p /workdir/upload
+        sudo mkdir -p /workdir/boot
+        sudo mkdir -p /workdir/modules
         sudo chown $USER:$GROUPS /workdir
         sudo chown $USER:$GROUPS /workdir/upload
+        sudo chown $USER:$GROUPS /workdir/boot
+        sudo chown $USER:$GROUPS /workdir/modules
 
     - name: Check for updates
       id: check
@@ -49,8 +54,8 @@ jobs:
       if: steps.check.outputs.status == 'success'
       run: |
         df -hT $PWD
-        kernel_file=$(curl -s https://www.kernel.org/ | grep '5.4' | grep '.tar.xz' | awk -F '"' '{print $2}')
-        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.4' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}')
+        kernel_file=$(curl -s https://www.kernel.org/ | grep '5.4' | grep '.tar.xz' | awk -F '"' '{print $2}' | head -n 1)
+        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.4' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}' | head -n 1)
         wget -O kernel.tar.xz $kernel_file
         tar -Jxvf kernel.tar.xz -C /workdir && cd /workdir/linux-$kernel_ver
         echo "::set-output name=status::success"
@@ -60,20 +65,49 @@ jobs:
       if: steps.code.outputs.status == 'success'
       working-directory: /workdir
       run: |
-        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.4' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}')
+        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.4' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}' | head -n 1)
         cd linux-$kernel_ver
         wget -O .config https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.4.y/config
         sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
         wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/add_driver.sh
-        wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/change_offset.sh
+        wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/run_patch.sh
         chmod +x ./*.sh
         ./add_driver.sh
-        ./change_offset.sh
+        ./run_patch.sh
+        rm -rf ./patch
+        rm -rf ./*.sh
         echo -e "$(nproc) thread compile"
-        export LOCALVERSION=
-        export KDEB_PKGVERSION=1
-        sudo time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) deb-pkg
-        cd /workdir && mv *.deb /workdir/upload
+        # export LOCALVERSION=
+        # export KDEB_PKGVERSION=1
+        # sudo time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 1)) deb-pkg
+        # cd /workdir 
+        # mv *.deb /workdir/upload
+        time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 2)) Image modules
+        kver=`make kernelrelease`
+        make INSTALL_MOD_PATH=./tmp_modules modules_install
+        cp -f ./System.map /workdir/boot/System.map-$kver
+        cp -f ./.config /workdir/boot/config-$kver
+        cp -f ./arch/arm64/boot/Image /workdir/boot/vmlinuz-$kver
+        cp -rf ./tmp_modules/lib/modules/* /workdir/modules
+        
+        #Boot
+        cd /workdir/boot
+        wget -O uIntrd-$kver https://github.com/radityabh/kernel-compiler/raw/main/files/uintrd/uInitrd-5.4
+        chmod +x *
+        tar -czf boot-$kver.tar.gz * && sync
+        cp -f *.tar.gz /workdir/upload
+
+        #Modules
+        cd /workdir/modules
+        chmod +x *
+        tar -czf modules-$kver.tar.gz * && sync
+        cp -f *.tar.gz /workdir/upload
+        
+        #dtbs
+        cd /workdir/upload
+        wget -O dtb-amlogic-$kver.tar.gz https://github.com/radityabh/kernel-compiler/raw/main/files/dtb/dtb.tar.gz
+        chmod +x *
+
         echo "::set-output name=status::success"
         echo "FILE_DATE=Kernel_Amlogic_$kernel_ver_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV   
 
@@ -85,8 +119,8 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && steps.compile.outputs.status == 'success' && !cancelled()
       run: |
-        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.4' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}')
-        echo "::set-output name=release_tag::Amlogic_Kernel_${kernel_ver}_latest_arm64_$(date +"%Y.%m.%d-%H%M")"
+        kernel_ver=$(curl -s https://www.kernel.org/ | grep '5.4' | grep '.tar.xz' | awk -F '"' '{print $2}' | awk -F '/' '{print $8}' | awk -F '.tar.xz' '{print $1}' | awk -F 'linux-' '{print $2}' | head -n 1)
+        echo "::set-output name=release_tag::Kernel_${kernel_ver}_arm64_$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
         echo "::set-output name=status::success"
 
@@ -96,7 +130,6 @@ jobs:
       with:
         allowUpdates: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        name: ${{ steps.tag.outputs.release_tag }}
         tag: ${{ steps.tag.outputs.release_tag }}
         artifacts:  /workdir/upload/*
         body: |
