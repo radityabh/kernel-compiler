@@ -105,7 +105,7 @@ jobs:
         
         #dtbs
         cd /workdir/upload
-        wget -O dtb-amlogic-$kver.tar.gz https://github.com/radityabh/kernel-compiler/raw/main/files/dtb/dtb.tar.gz
+        wget -O dtb-amlogic-$kver.tar.gz https://github.com/radityabh/kernel-compiler/raw/main/files/dtb/dtb-5.16.tar.gz
         chmod +x *
 
         echo "::set-output name=status::success"

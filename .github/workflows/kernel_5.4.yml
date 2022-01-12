@@ -70,10 +70,10 @@ jobs:
         wget -O .config https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.4.y/config
         sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
         wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/add_driver.sh
-        wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/change_offset.sh
+        wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/patch_5.4.sh
         chmod +x ./*.sh
         ./add_driver.sh
-        ./change_offset.sh
+        ./patch_5.4.sh
         rm -rf ./*.sh
         echo -e "$(nproc) thread compile"
         # export LOCALVERSION=
@@ -104,7 +104,7 @@ jobs:
         
         #dtbs
         cd /workdir/upload
-        wget -O dtb-amlogic-$kver.tar.gz https://github.com/radityabh/kernel-compiler/raw/main/files/dtb/dtb.tar.gz
+        wget -O dtb-amlogic-$kver.tar.gz https://github.com/radityabh/kernel-compiler/raw/main/files/dtb/dtb-5.4.tar.gz
         chmod +x *
 
         echo "::set-output name=status::success"
