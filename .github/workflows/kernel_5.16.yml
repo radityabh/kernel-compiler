@@ -36,8 +36,12 @@ jobs:
         sudo ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
         sudo mkdir -p /workdir
         sudo mkdir -p /workdir/upload
+        sudo mkdir -p /workdir/boot
+        sudo mkdir -p /workdir/modules
         sudo chown $USER:$GROUPS /workdir
         sudo chown $USER:$GROUPS /workdir/upload
+        sudo chown $USER:$GROUPS /workdir/boot
+        sudo chown $USER:$GROUPS /workdir/modules
 
     - name: Check for updates
       id: check
@@ -73,11 +77,33 @@ jobs:
         rm -rf ./patch
         rm -rf ./*.sh
         echo -e "$(nproc) thread compile"
-        export LOCALVERSION=
-        export KDEB_PKGVERSION=1
-        sudo time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) deb-pkg
-        cd /workdir 
-        mv *.deb /workdir/upload
+        # export LOCALVERSION=
+        # export KDEB_PKGVERSION=1
+        # sudo time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 1)) deb-pkg
+        # cd /workdir 
+        # mv *.deb /workdir/upload
+        time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 1)) Image modules
+        kver=`make kernelrelease`
+        make INSTALL_MOD_PATH=./tmp_modules modules_install
+        cp -f ./System.map /workdir/boot/System.map-$kver
+        cp -f ./.config /workdir/boot/config-$kver
+        cp -f ./arch/arm64/boot/Image /workdir/boot/vmlinuz-$kver
+        cp -rf ./tmp_modules/lib/modules/* /workdir/modules
+        
+        #Boot
+        cd /workdir/boot
+        chmod +x *
+        tar -czf boot-$kver.tar.gz * && sync
+        cp -f *.tar.gz /workdir/upload
+
+        #Modules
+        cd /workdir/modules
+        chmod +x *
+        tar -czf modules-$kver.tar.gz * && sync
+        cp -f *.tar.gz /workdir/upload
+        
+        #dtbs
+        cd /workdir/upload
         echo "::set-output name=status::success"
         echo "FILE_DATE=Kernel_Amlogic_$kernel_ver_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV   
 
