@@ -75,8 +75,8 @@ jobs:
         chmod +x ./*.sh
         ./add_driver.sh
         ./patch_5.4.sh
-        rm -rf ./*.sh
         echo -e "$(nproc) thread compile"
+        # rm -rf ./*.sh
         # export LOCALVERSION=
         # export KDEB_PKGVERSION=1
         # sudo time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 1)) deb-pkg

@@ -3,6 +3,7 @@
 #-----------wifi driver-------------------
 
 drw="../tmp_modules/lib/modules/${kver}/driver/net/realtek/"
+echo $drw
 
 git clone -b v5.3.9 https://github.com/aircrack-ng/rtl8188eus "rtl8188eu"
 cd rtl8188eu
