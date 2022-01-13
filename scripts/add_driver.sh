@@ -43,7 +43,7 @@ sed -i 's#---help---##g' "$wd/rtl8188fu/Kconfig"
 sed -i 's#Help message of RTL8818FU##g' "$wd/rtl8188fu/Kconfig"
 sed -i 's#RTL8188EU#8188EU#g' "$wd/8188eu/Kconfig"
 sed -i 's#---help---##g' "$wd/8188eu/Kconfig"
-sed -i 's#Help message of RTL8188EU##g' "$wd/8188eu/Kconfig"
+sed -i 's#Help message of 8188EU##g' "$wd/8188eu/Kconfig"
 cat << 'EOF' >> "$wd/8192cu/Kconfig"
 config 8192CU
 	tristate "Realtek 8192CU USB WiFi"
