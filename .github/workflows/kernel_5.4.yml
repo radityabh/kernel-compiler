@@ -85,7 +85,7 @@ jobs:
         time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 2)) Image modules
         kver=`make kernelrelease`
         make INSTALL_MOD_PATH=./tmp_modules modules_install
-        ./add_tainted_driver.sh
+        ./add_tainted_driver.sh $kver
         cp -f ./System.map /workdir/boot/System.map-$kver
         cp -f ./.config /workdir/boot/config-$kver
         cp -f ./arch/arm64/boot/Image /workdir/boot/vmlinuz-$kver
