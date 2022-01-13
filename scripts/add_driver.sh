@@ -47,9 +47,7 @@ cat << 'EOF' >> "$wd/rtl8192cu/Kconfig"
 config RTL8192CU
 	tristate "Realtek 8192CU USB WiFi"
 	depends on USB
-
-endif # WLAN_VENDOR_REALTEK
 EOF
 sed -i 's#88XX#8812#g' "$wd/rtl8812au/Kconfig"
 sed -i 's#help##g' "$wd/rtl8812au/Kconfig"
-sed -i 's#Help message of 8812au##g' "$wd/rtl8188eu/Kconfig"
+sed -i 's#Help message of 8812au##g' "$wd/rtl8812au/Kconfig"
