@@ -116,7 +116,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && steps.compile.outputs.status == 'success' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::Kernel_5.4_arm64_$(date +"%Y.%m.%d-%H%M")"
+        echo "::set-output name=release_tag::Kernel_5.4-Kilman_arm64_$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
         echo "::set-output name=status::success"
 
