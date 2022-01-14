@@ -54,7 +54,7 @@ jobs:
       if: steps.check.outputs.status == 'success'
       run: |
         
-        git clone --depth 1 -b v4.19 https://kernel.googlesource.com/pub/scm/linux/kernel/git/khilman/linux-amlogic /workdir/linux-4.19
+        git clone -b v4.19 https://kernel.googlesource.com/pub/scm/linux/kernel/git/khilman/linux-amlogic /workdir/linux-4.19
         echo "::set-output name=status::success"
 
     - name: Compile the kernel
