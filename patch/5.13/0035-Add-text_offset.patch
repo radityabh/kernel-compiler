@@ -43,6 +43,7 @@ index 248e1457b700..298f51c87f40 100644
  
 +export TEXT_OFFSET
 +
+ core-y		+= arch/arm64/
  libs-y		:= arch/arm64/lib/ $(libs-y)
  libs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
  
