@@ -67,10 +67,10 @@ jobs:
         sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
         wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/add_driver.sh
         wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/add_tainted_driver.sh
-        wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/run_patch.sh
+        wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/patch_5.13.sh
         chmod +x ./*.sh
         ./add_driver.sh
-        ./run_patch.sh
+        ./patch_5.13.sh
         echo -e "$(nproc) thread compile"
         # rm -rf ./*.sh
         # export LOCALVERSION=
