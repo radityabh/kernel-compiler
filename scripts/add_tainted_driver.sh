@@ -25,3 +25,10 @@ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KSRC=../
 mkdir -p $drw/rtl8812au
 cp -f *.ko $drw/rtl8812au
 cd ..
+
+git clone https://github.com/clnhub/rtl8192eu-linux "rtl8192eu"
+cd rtl8192eu
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KSRC=../
+mkdir -p $drw/rtl8192eu
+cp -f *.ko $drw/rtl8192eu
+cd ..
