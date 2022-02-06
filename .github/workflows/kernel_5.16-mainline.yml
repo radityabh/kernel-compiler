@@ -70,12 +70,13 @@ jobs:
         wget -O .config https://raw.githubusercontent.com/radityabh/kernel-compiler/main/config/kernel-5.16.y/config
         sed -ri '/CONFIG_SYSTEM_TRUSTED_KEYS/s/=.+/=""/g' .config && scripts/config --disable MODULE_SIG && scripts/config --disable DEBUG_INFO
         wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/add_driver.sh
+        wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/add_tainted_driver.sh
         wget https://raw.githubusercontent.com/radityabh/kernel-compiler/main/scripts/run_patch.sh
         chmod +x ./*.sh
         ./add_driver.sh
         ./run_patch.sh
-        rm -rf ./patch
-        rm -rf ./*.sh
+        # rm -rf ./patch
+        # rm -rf ./*.sh
         echo -e "$(nproc) thread compile"
         # export LOCALVERSION=
         # export KDEB_PKGVERSION=1
@@ -85,6 +86,7 @@ jobs:
         time make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(($(nproc) + 2)) Image modules
         kver=`make kernelrelease`
         make INSTALL_MOD_PATH=./tmp_modules modules_install
+        ./add_tainted_driver.sh $kver
         cp -f ./System.map /workdir/boot/System.map-$kver
         cp -f ./.config /workdir/boot/config-$kver
         cp -f ./arch/arm64/boot/Image /workdir/boot/vmlinuz-$kver
