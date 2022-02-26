@@ -39,3 +39,10 @@ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KSRC=../
 mkdir -p $drw/rtl8821cu
 cp -f *.ko $drw/rtl8821cu
 cd ..
+
+git clone https://github.com/McMCCRU/rtl8188gu "rtl8188gu"
+cd rtl8188gu
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KSRC=../
+mkdir -p $drw/rtl8188gu
+cp -f *.ko $drw/rtl8188gu
+cd ..
