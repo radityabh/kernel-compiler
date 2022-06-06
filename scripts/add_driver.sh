@@ -32,3 +32,9 @@ sed -i 's#---help---##g' "$wd/rtl8189es/Kconfig"
 sed -i 's#Help message of RTL8189ES##g' "$wd/rtl8189es/Kconfig"
 sed -i 's#---help---##g' "$wd/rtl8188fu/Kconfig"
 sed -i 's#Help message of RTL8818FU##g' "$wd/rtl8188fu/Kconfig"
+
+#----------------disable teriak teriak
+sed -i 's#CONFIG_RTW_DEBUG = y#CONFIG_RTW_DEBUG = n#g' "$wd/rtl8189fs/Makefile"
+sed -i 's#CONFIG_RTW_LOG_LEVEL = 4#CONFIG_RTW_LOG_LEVEL = 0#g' "$wd/rtl8189fs/Makefile"
+sed -i 's#CONFIG_PROC_DEBUG = y#CONFIG_PROC_DEBUG = n#g' "$wd/rtl8189fs/Makefile"
+sed -i 's#CONFIG_POWER_SAVING = y#CONFIG_POWER_SAVING = n#g' "$wd/rtl8189fs/Makefile"
